@@ -61,61 +61,43 @@ grid_search = GridSearchCV(
     n_jobs=-1,
 )
 
+with mlflow.start_run(nested=True):
+    grid_search.fit(X_train, y_train)
 
-# ==============================
-# Training + MLflow logging
-# ==============================
-grid_search.fit(X_train, y_train)
+    best_model = grid_search.best_estimator_
+    y_pred = best_model.predict(X_test)
 
-best_model = grid_search.best_estimator_
-y_pred = best_model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    prec = precision_score(y_test, y_pred, average="macro")
+    rec = recall_score(y_test, y_pred, average="macro")
+    f1 = f1_score(y_test, y_pred, average="macro")
 
-# Metrics
-acc = accuracy_score(y_test, y_pred)
-prec = precision_score(y_test, y_pred, average="macro")
-rec = recall_score(y_test, y_pred, average="macro")
-f1 = f1_score(y_test, y_pred, average="macro")
+    mlflow.log_params(grid_search.best_params_)
+    mlflow.log_metric("accuracy", acc)
+    mlflow.log_metric("precision", prec)
+    mlflow.log_metric("recall", rec)
+    mlflow.log_metric("f1_score", f1)
 
-# Log params & metrics
-mlflow.log_params(grid_search.best_params_)
-mlflow.log_metric("accuracy", acc)
-mlflow.log_metric("precision", prec)
-mlflow.log_metric("recall", rec)
-mlflow.log_metric("f1_score", f1)
+    mlflow.sklearn.log_model(best_model, "model")
 
-# Log model
-mlflow.sklearn.log_model(best_model, "model")
+    # Confusion Matrix
+    cm = confusion_matrix(y_test, y_pred)
 
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
 
-# ==============================
-# Artifacts
-# ==============================
+    cm_path = "confusion_matrix.png"
+    plt.savefig(cm_path)
+    plt.close()
 
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
+    mlflow.log_artifact(cm_path)
 
-plt.figure(figsize=(6, 4))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
+    # Classification Report
+    report = classification_report(y_test, y_pred)
+    report_path = "classification_report.txt"
+    with open(report_path, "w") as f:
+        f.write(report)
 
-cm_path = "confusion_matrix.png"
-plt.tight_layout()
-plt.savefig(cm_path)
-plt.close()
-
-mlflow.log_artifact(cm_path)
-
-# Classification Report
-report = classification_report(y_test, y_pred)
-
-report_path = "classification_report.txt"
-with open(report_path, "w") as f:
-    f.write(report)
-
-mlflow.log_artifact(report_path)
-
-
-print("Training finished")
-print("Best Params:", grid_search.best_params_)
-print("Accuracy:", acc)
+    mlflow.log_artifact(report_path)
