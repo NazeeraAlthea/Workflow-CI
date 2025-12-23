@@ -1,5 +1,15 @@
 import pandas as pd
 import mlflow
+mlflow.set_experiment("Student-Performance")
+
+# 🔑 attach ke run MLflow Project jika ada
+run_id = os.environ.get("MLFLOW_RUN_ID")
+if run_id:
+    mlflow.start_run(run_id=run_id)
+else:
+    # fallback kalau dijalankan manual (python modelling.py)
+    mlflow.start_run(run_name="local-run")
+
 import mlflow.sklearn
 
 from sklearn.model_selection import train_test_split, GridSearchCV
