@@ -22,7 +22,7 @@ jobs:
 
       - name: Run MLflow Project
         run: |
-          mlflow run MLProject --env-manager=local
+          mlflow run MLProject
 
       - name: Save mlruns to repo
         run: |
