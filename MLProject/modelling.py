@@ -1,5 +1,7 @@
 import pandas as pd
 import mlflow
+mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_experiment("Student-Performance")
 import mlflow.sklearn
 
 from sklearn.model_selection import train_test_split, GridSearchCV
