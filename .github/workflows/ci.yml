@@ -16,17 +16,20 @@ jobs:
         with:
           auto-update-conda: true
           python-version: 3.11
-          activate-environment: student-performance-env
+          activate-environment: base
 
       - name: Install MLflow
+        shell: bash -l {0}
         run: |
           pip install mlflow
 
       - name: Run MLflow Project
+        shell: bash -l {0}
         run: |
           mlflow run MLProject
 
       - name: Save mlruns
+        shell: bash -l {0}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
