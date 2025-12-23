@@ -46,16 +46,13 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           cd MLProject
-
-          EXP_ID=$(ls mlruns | grep -E '^[0-9]+$' | head -1)
-          RUN_ID=$(ls mlruns/$EXP_ID | head -1)
+          MODEL_PATH=$(find mlruns -name "model" -type d | head -1)
 
           mlflow models build-docker \
-            -m "runs:/$RUN_ID/model" \
+            -m "$MODEL_PATH" \
             -n "${{ secrets.DOCKERHUB_USERNAME }}/student-performance:latest" \
             --enable-mlserver
 
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/student-performance:latest
-
 
 
