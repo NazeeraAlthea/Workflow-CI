@@ -1,29 +1,38 @@
-name: MLflow CI Training
+name: MLflow Training Workflow
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  train-model:
+  training-job:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install depedencies
+      - name: Install Dependencies
         run: |
           pip install -r requirements.txt
 
       - name: Run MLflow Project
         run: |
           cd MLProject
-          mlflow run .
+          mlflow run . \
+            --env-manager local \
+            --experiment-name "Student-Performance"
+        env:
+          MLFLOW_TRACKING_URI: "file:./mlruns"
+
+      - name: Save Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MLflow-Artifacts
+          path: MLProject/mlruns/
