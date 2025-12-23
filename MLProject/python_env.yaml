@@ -1,7 +1,0 @@
-python: "3.11"
-dependencies:
-  - pandas
-  - scikit-learn
-  - mlflow
-  - matplotlib
-  - seaborn

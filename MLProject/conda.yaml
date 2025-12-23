@@ -1,10 +1,12 @@
-name: mlflow-env
+name: student-performance-env
 channels:
   - defaults
 dependencies:
   - python=3.11
   - pip
   - pip:
+      - mlflow
       - pandas
       - scikit-learn
-      - mlflow
+      - matplotlib
+      - seaborn
