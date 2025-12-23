@@ -1,87 +1,45 @@
 import pandas as pd
 import mlflow
-mlflow.set_tracking_uri("file:./mlruns")
-mlflow.set_experiment("Student-Performance")
 import mlflow.sklearn
 
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    confusion_matrix,
-    classification_report,
-)
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+def main():
+    # Load dataset
+    df = pd.read_csv("dataset_preprocessed/data.csv")
 
+    X = df.drop(columns=["Performance_Level"])
+    y = df["Performance_Level"]
 
-mlflow.set_experiment("Student-Performance")
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
+    # Model
+    model = RandomForestClassifier(
+        n_estimators=100,
+        random_state=42
+    )
 
-# Load dataset
-df = pd.read_csv("student-performance_preprocessing/data.csv")
+    with mlflow.start_run():
+        model.fit(X_train, y_train)
 
-X = df.drop(columns=["Performance_Level"])
-y = df["Performance_Level"]
+        preds = model.predict(X_test)
+        acc = accuracy_score(y_test, preds)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
+        # Logging
+        mlflow.log_param("n_estimators", 100)
+        mlflow.log_metric("accuracy", acc)
 
+        mlflow.sklearn.log_model(
+            sk_model=model,
+            artifact_path="model",
+            registered_model_name="rf_ci_model"
+        )
 
-param_grid = {
-    "C": [0.01, 0.1, 1.0, 10.0],
-    "solver": ["lbfgs"],
-    "max_iter": [500, 1000],
-}
+        print(f"Accuracy: {acc}")
 
-model = LogisticRegression()
-
-grid = GridSearchCV(
-    model,
-    param_grid,
-    cv=3,
-    scoring="accuracy",
-    n_jobs=-1
-)
-
-# 🔑 TIDAK ADA start_run DI SINI
-grid.fit(X_train, y_train)
-
-best_model = grid.best_estimator_
-y_pred = best_model.predict(X_test)
-
-acc = accuracy_score(y_test, y_pred)
-prec = precision_score(y_test, y_pred, average="macro")
-rec = recall_score(y_test, y_pred, average="macro")
-f1 = f1_score(y_test, y_pred, average="macro")
-
-mlflow.log_params(grid.best_params_)
-mlflow.log_metric("accuracy", acc)
-mlflow.log_metric("precision", prec)
-mlflow.log_metric("recall", rec)
-mlflow.log_metric("f1_score", f1)
-
-mlflow.sklearn.log_model(best_model, "model")
-
-# Artifacts
-cm = confusion_matrix(y_test, y_pred)
-
-plt.figure(figsize=(6, 4))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-plt.savefig("confusion_matrix.png")
-plt.close()
-
-mlflow.log_artifact("confusion_matrix.png")
-
-with open("classification_report.txt", "w") as f:
-    f.write(classification_report(y_test, y_pred))
-
-mlflow.log_artifact("classification_report.txt")
-
-print("Training finished")
-print("Accuracy:", acc)
+if __name__ == "__main__":
+    main()
