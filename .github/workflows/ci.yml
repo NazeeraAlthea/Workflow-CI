@@ -14,9 +14,10 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
-          python-version: 3.11
-          activate-environment: base
+          auto-update-conda: false
+          python-version: "3.11"
+          activate-environment: ""
+          use-mamba: false
 
       - name: Install MLflow
         shell: bash -l {0}
