@@ -5,33 +5,30 @@ on:
     branches: [ main ]
 
 jobs:
-  train:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          auto-update-conda: false
           python-version: "3.11"
 
-      - name: Install MLflow
-        shell: bash -l {0}
+      - name: Install dependencies
         run: |
-          pip install mlflow
+          pip install -r requirements.txt
 
       - name: Run MLflow Project
-        shell: bash -l {0}
         run: |
-          mlflow run MLProject
+          mlflow run MLProject --env-manager=local
 
-      - name: Save mlruns
-        shell: bash -l {0}
+      - name: Save mlruns to repo
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add mlruns/
           git commit -m "Save mlruns from CI run" || echo "No changes"
           git push origin main
+
