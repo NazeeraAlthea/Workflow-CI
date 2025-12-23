@@ -16,7 +16,7 @@ mlflow.set_experiment("Student-Performance")
 
 # Load dataset hasil preprocessing
 df = pd.read_csv(
-    "student-performance_preprocessing/data.csv"
+    "MLProject/student-performance_preprocessing/data.csv"
 )
 
 X = df.drop(columns=["Performance_Level"])
