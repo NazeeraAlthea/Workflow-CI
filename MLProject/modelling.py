@@ -42,9 +42,7 @@ grid_search = GridSearchCV(
     n_jobs=-1
 )
 
-if mlflow.active_run() is None:
-    mlflow.start_run(run_name="LogReg_Tuning")
-    
+
 grid_search.fit(X_train, y_train)
 
 best_model = grid_search.best_estimator_
@@ -88,6 +86,3 @@ with open(report_path, "w") as f:
     f.write(report)
 
 mlflow.log_artifact(report_path)
-
-if mlflow.active_run() is not None:
-    mlflow.end_run()

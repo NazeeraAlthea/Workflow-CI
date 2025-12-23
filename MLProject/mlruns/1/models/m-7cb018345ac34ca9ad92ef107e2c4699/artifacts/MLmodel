@@ -1,0 +1,22 @@
+artifact_path: file:///D:/05_Personal/Asah by Dicoding/MSML_Muhammad-Arya-Maulana/Workflow-CI/MLProject/mlruns/1/models/m-7cb018345ac34ca9ad92ef107e2c4699/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.9
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+mlflow_version: 3.8.0
+model_id: m-7cb018345ac34ca9ad92ef107e2c4699
+model_size_bytes: 2088
+model_uuid: m-7cb018345ac34ca9ad92ef107e2c4699
+prompts: null
+run_id: 4af6c08eb1cc4e4c8f3c80237f7d5756
+utc_time_created: '2025-12-23 12:16:10.790399'
