@@ -1,24 +1,34 @@
-name: MLflow CI Basic
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  train:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
       - name: Run MLflow Project
-        run: mlflow run MLProject
+        run: |
+          mlflow run MLProject --env-manager=local
+
+      - name: Save mlruns to repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add mlruns/
+          git commit -m "Save mlruns from CI run" || echo "No changes"
+          git push origin main
+
